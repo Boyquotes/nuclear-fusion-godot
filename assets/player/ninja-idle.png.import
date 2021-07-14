@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/level_tileset.png-762ecc1b03949936b48798d6131ba0c8.stex"
+path="res://.import/ninja-idle.png-e9f482834a3f14bcf5ba97f4f861af97.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tilesets/level_tileset.png"
-dest_files=[ "res://.import/level_tileset.png-762ecc1b03949936b48798d6131ba0c8.stex" ]
+source_file="res://assets/player/ninja-idle.png"
+dest_files=[ "res://.import/ninja-idle.png-e9f482834a3f14bcf5ba97f4f861af97.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=true
+flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2
