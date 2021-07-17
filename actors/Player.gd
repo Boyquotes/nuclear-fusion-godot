@@ -1,34 +1,67 @@
-class_name Player
-extends Actor
+extends KinematicBody2D
+
+# tile size 16
+
+const UP = Vector2(0, -1)
+const SLOPE_STOP = 64
+var velocity = Vector2()
+var move_speed = 6 * Globals.UNIT_SIZE
+var gravity
+var max_jump_velocity
+var min_jump_velocity
+var is_grounded
+var is_jumping = false
+
+var max_jump_height = 4.25 * Globals.UNIT_SIZE
+var min_jump_height = 0.75 * Globals.UNIT_SIZE
+var jump_duration = 0.5
+
 
 onready var sprite = $AnimatedSprite
+onready var raycasts = $Raycasts
+onready var anim_player = $AnimationPlayer
 
-var double_jumps = 0
-export var max_double_jump = 1
+func _ready():
+	gravity = 2 * max_jump_height / pow(jump_duration, 2)
+	max_jump_velocity = -sqrt(2 * gravity * max_jump_height)
+	min_jump_velocity = -sqrt(2 * gravity * min_jump_height)
+	
+	Globals.player = self
 
 func _physics_process(delta):
-	var is_jump_interrupted = Input.is_action_just_released("jump") and _velocity.y < 0.0
-	var direction = get_direction()
-	var velocity = calculate_move_velocity(_velocity, direction, speed, is_jump_interrupted)
+	pass
+	
+func _apply_gravity(delta):
 	velocity.y += gravity * delta
-	if is_on_wall() and not is_on_floor() and velocity.y > 0.0:
-		velocity.y = gravity * 0.01
-	_velocity = move_and_slide(velocity, FLOOR_NORMAL)
-	if _velocity.x != 0.0:
-		sprite.flip_h = true if _velocity.x < 0.0 else false
-		
 	
-func get_direction() -> Vector2:
-	var direction = Vector2(Input.get_action_strength("right") - Input.get_action_strength("left"),
-							-1.0 if Input.is_action_just_pressed("jump") and (is_on_floor() or is_on_wall()) else 1.0)
-	return direction
+func _apply_movement():
+	if is_jumping && velocity.y >= 0:
+		is_jumping = false
+	velocity = move_and_slide(velocity, UP, SLOPE_STOP)
+	is_grounded = _check_is_grounded()
+	
+func _handle_move_input():
+	var move_direction = -int(Input.is_action_pressed("left")) + int(Input.is_action_pressed("right"))
+	velocity.x = lerp(velocity.x, move_speed * move_direction, _get_h_weight())
+	if move_direction != 0:
+		sprite.scale.x = move_direction
+	
+func _get_h_weight():
+	return 0.2 if is_grounded else 0.1
 
-func calculate_move_velocity(linear_velocity, direction, speed, is_jump_interrupted):
-	var velocity = linear_velocity
-	velocity.x = speed.x * direction.x
-	if direction.y == -1.0:
-		velocity.y = speed.y * direction.y
-	if is_jump_interrupted:
-		velocity.y = 0.0
+func _check_is_grounded():
+	for raycast in raycasts.get_children():
+		if raycast.is_colliding():
+			print("is on ground")
+			return true
+	return false
 	
-	return velocity
+func _assign_animation():
+	var anim = "idle"
+	if !is_grounded:
+		anim = "jump"
+	elif velocity.x != 0:
+		anim = "run"
+		
+	if anim_player.assigned_animation != anim:
+		anim_player.play(anim)
