@@ -51,8 +51,9 @@ func _get_transition(delta):
 			elif parent.velocity.x == 0:
 				return states.idle
 		states.jump:
-			if parent.wall_direction != 0 && parent.wall_slide_cooldown.is_stopped():
-				return states.wall_slide
+			if parent.wall_direction != 0 &&  parent.wall_slide_cooldown.is_stopped():
+				if parent.velocity.y >= 0:
+					return states.wall_slide
 			elif parent.velocity.y >= 0:
 				return states.fall
 			elif parent.is_grounded:
