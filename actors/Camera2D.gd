@@ -1,7 +1,7 @@
 extends Camera2D
 
 const LOOK_AHEAD_FACTOR = 0.04
-const SHIFT_TRANS = Tween.EASE_IN
+const SHIFT_TRANS = Tween.TRANS_SINE
 const SHIFT_EASE = Tween.EASE_OUT
 const SHIFT_DURATION = 1.0
 
@@ -10,7 +10,7 @@ onready var prev_camera_pos = get_camera_position()
 onready var tween = $ShiftTween
 
 func _process(delta):
-	_check_facing()
+	#_check_facing()
 	prev_camera_pos = get_camera_position()
 
 func _check_facing():
