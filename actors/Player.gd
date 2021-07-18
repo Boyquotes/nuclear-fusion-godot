@@ -15,7 +15,7 @@ var is_jumping = false
 var move_direction = 0
 var wall_direction = 1
 
-var max_jump_height = 4.25 * Globals.UNIT_SIZE
+var max_jump_height = 4.5 * Globals.UNIT_SIZE
 var min_jump_height = 0.75 * Globals.UNIT_SIZE
 var jump_duration = 0.5
 
