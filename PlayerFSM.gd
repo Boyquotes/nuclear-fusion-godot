@@ -14,16 +14,22 @@ func _state_logic(delta):
 	if state != states.wall_slide:
 		parent._handle_movement()
 	parent._apply_gravity(delta)
+	if state == states.wall_slide:
+		parent._cap_gravity_wall_slide()
 	parent._apply_movement()
 	
 func _input(event):
 	if [states.idle, states.run, states.wall_slide].has(state):
 		if event.is_action_pressed("jump"):
-			parent.velocity.y = parent.max_jump_velocity
-			parent.is_jumping = true
+			if state == states.wall_slide:
+				parent.wall_jump()
+			else:
+				parent.jump()
+			set_state(states.jump)
 	if state == states.jump:
 		if event.is_action_released("jump") && parent.velocity.y < parent.min_jump_velocity:
 			parent.velocity.y = parent.min_jump_velocity
+			set_state(states.jump)
 	
 func _get_transition(delta):
 	match state:

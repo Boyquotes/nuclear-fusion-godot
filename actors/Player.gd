@@ -9,6 +9,7 @@ var move_speed = 6 * Globals.UNIT_SIZE
 var gravity
 var max_jump_velocity
 var min_jump_velocity
+var wall_jump_velocity
 var is_grounded
 var is_jumping = false
 var move_direction = 0
@@ -29,6 +30,7 @@ func _ready():
 	gravity = 2 * max_jump_height / pow(jump_duration, 2)
 	max_jump_velocity = -sqrt(2 * gravity * max_jump_height)
 	min_jump_velocity = -sqrt(2 * gravity * min_jump_height)
+	wall_jump_velocity = Vector2(move_speed * 2.75, max_jump_velocity)
 	
 	Globals.player = self
 
@@ -37,6 +39,10 @@ func _physics_process(delta):
 	
 func _apply_gravity(delta):
 	velocity.y += gravity * delta
+	
+func _cap_gravity_wall_slide():
+	var max_velocity = Globals.UNIT_SIZE if !Input.is_action_just_pressed("down") else 6 * Globals.UNIT_SIZE
+	velocity.y = min(velocity.y, max_velocity)
 	
 func _apply_movement():
 	if is_jumping && velocity.y >= 0:
@@ -55,6 +61,15 @@ func _handle_movement():
 	velocity.x = lerp(velocity.x, move_speed * move_direction, _get_h_weight())
 	if move_direction != 0:
 		sprite.scale.x = move_direction
+
+func wall_jump():
+	var vel = wall_jump_velocity
+	vel.x *= -wall_direction
+	velocity = vel
+
+func jump():
+	velocity.y = max_jump_velocity
+	is_jumping = true
 	
 func _get_h_weight():
 	return 0.2 if is_grounded else 0.1
