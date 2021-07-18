@@ -1,6 +1,6 @@
 extends KinematicBody2D
 
-# tile size 16
+signal grounded_updated(is_grounded)
 
 const UP = Vector2(0, -1)
 const SLOPE_STOP = 64
@@ -38,7 +38,11 @@ func _apply_movement():
 	if is_jumping && velocity.y >= 0:
 		is_jumping = false
 	velocity = move_and_slide(velocity, UP, SLOPE_STOP)
+	var was_grounded = is_grounded
 	is_grounded = _check_is_grounded()
+	
+	if was_grounded == null || is_grounded != was_grounded:
+		emit_signal("grounded_updated", is_grounded)
 	
 func _handle_move_input():
 	var move_direction = -int(Input.is_action_pressed("left")) + int(Input.is_action_pressed("right"))
@@ -52,7 +56,6 @@ func _get_h_weight():
 func _check_is_grounded():
 	for raycast in raycasts.get_children():
 		if raycast.is_colliding():
-			print("is on ground")
 			return true
 	return false
 	
