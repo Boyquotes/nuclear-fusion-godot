@@ -25,12 +25,14 @@ onready var floor_raycasts = $FloorRaycasts
 onready var left_wall_raycasts = $WallRaycasts/LeftWallRaycasts
 onready var right_wall_raycasts = $WallRaycasts/RightWallRaycasts
 onready var anim_player = $AnimationPlayer
+onready var wall_slide_cooldown = $WallSlideCooldown
+onready var wall_slide_sticky_timer = $WallSlideStickyTimer
 
 func _ready():
 	gravity = 2 * max_jump_height / pow(jump_duration, 2)
 	max_jump_velocity = -sqrt(2 * gravity * max_jump_height)
 	min_jump_velocity = -sqrt(2 * gravity * min_jump_height)
-	wall_jump_velocity = Vector2(move_speed * 2.75, max_jump_velocity)
+	wall_jump_velocity = Vector2(move_speed * 1.5, max_jump_velocity)
 	
 	Globals.player = self
 
@@ -70,9 +72,24 @@ func wall_jump():
 func jump():
 	velocity.y = max_jump_velocity
 	is_jumping = true
-	
+
+func _handle_wall_slide_sticking():
+	if move_direction != 0 && move_direction != wall_direction:
+		if wall_slide_sticky_timer.is_stopped():
+			wall_slide_sticky_timer.start()
+	else:
+		wall_slide_sticky_timer.stop()
+
 func _get_h_weight():
-	return 0.2 if is_grounded else 0.1
+	if is_grounded:
+		return 0.2
+	else:
+		if move_direction == 0:
+			return 0.02
+		elif move_direction == sign(velocity.x) && abs(velocity.x) > move_speed:
+			return 0.0
+		else:
+			return 0.1
 	
 func _update_wall_direction():
 	var is_near_wall_left = _check_is_valid_wall(left_wall_raycasts)
