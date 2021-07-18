@@ -11,6 +11,8 @@ var max_jump_velocity
 var min_jump_velocity
 var is_grounded
 var is_jumping = false
+var move_direction = 0
+var wall_direction = 1
 
 var max_jump_height = 4.25 * Globals.UNIT_SIZE
 var min_jump_height = 0.75 * Globals.UNIT_SIZE
@@ -18,7 +20,9 @@ var jump_duration = 0.5
 
 
 onready var sprite = $AnimatedSprite
-onready var raycasts = $Raycasts
+onready var floor_raycasts = $FloorRaycasts
+onready var left_wall_raycasts = $WallRaycasts/LeftWallRaycasts
+onready var right_wall_raycasts = $WallRaycasts/RightWallRaycasts
 onready var anim_player = $AnimationPlayer
 
 func _ready():
@@ -43,20 +47,38 @@ func _apply_movement():
 	
 	if was_grounded == null || is_grounded != was_grounded:
 		emit_signal("grounded_updated", is_grounded)
+		
+func _update_move_direction():
+	move_direction = -int(Input.is_action_pressed("left")) + int(Input.is_action_pressed("right"))
 	
-func _handle_move_input():
-	var move_direction = -int(Input.is_action_pressed("left")) + int(Input.is_action_pressed("right"))
+func _handle_movement():
 	velocity.x = lerp(velocity.x, move_speed * move_direction, _get_h_weight())
 	if move_direction != 0:
 		sprite.scale.x = move_direction
 	
 func _get_h_weight():
 	return 0.2 if is_grounded else 0.1
+	
+func _update_wall_direction():
+	var is_near_wall_left = _check_is_valid_wall(left_wall_raycasts)
+	var is_near_wall_right = _check_is_valid_wall(right_wall_raycasts)
+	if is_near_wall_left && is_near_wall_right:
+		wall_direction = move_direction
+	else:
+		wall_direction = -int(is_near_wall_left) + int(is_near_wall_right)
 
 func _check_is_grounded():
-	for raycast in raycasts.get_children():
+	for raycast in floor_raycasts.get_children():
 		if raycast.is_colliding():
 			return true
+	return false
+	
+func _check_is_valid_wall(wall_raycasts):
+	for raycast in wall_raycasts.get_children():
+		if raycast.is_colliding():
+			var dot = acos(Vector2.UP.dot(raycast.get_collision_normal()))
+			if dot > PI * 0.35 && dot < PI * 0.55: # 60deg slope
+				return true
 	return false
 	
 func _assign_animation():

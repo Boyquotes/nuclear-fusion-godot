@@ -9,12 +9,15 @@ func _ready():
 	call_deferred("set_state", states.idle)
 
 func _state_logic(delta):
-	parent._handle_move_input()
+	parent._update_move_direction()
+	parent._update_wall_direction()
+	if state != states.wall_slide:
+		parent._handle_movement()
 	parent._apply_gravity(delta)
 	parent._apply_movement()
 	
 func _input(event):
-	if [states.idle, states.run].has(state):
+	if [states.idle, states.run, states.wall_slide].has(state):
 		if event.is_action_pressed("jump"):
 			parent.velocity.y = parent.max_jump_velocity
 			parent.is_jumping = true
@@ -41,19 +44,40 @@ func _get_transition(delta):
 			elif parent.velocity.x == 0:
 				return states.idle
 		states.jump:
-			if parent.is_grounded:
-				return states.idle
+			if parent.wall_direction != 0:
+				return states.wall_slide
 			elif parent.velocity.y >= 0:
 				return states.fall
+			elif parent.is_grounded:
+				return states.idle
 		states.fall:
-			if parent.is_grounded:
+			if parent.wall_direction != 0:
+				return states.wall_slide
+			elif parent.is_grounded:
 				return states.idle
 			elif parent.velocity.y < 0:
 				return states.jump
+		states.wall_slide:
+			if parent.wall_direction == 0:
+				if parent.is_grounded:
+					if parent.velocity.x != 0:
+						return states.run
+					return states.idle
+				elif parent.velocity.y < 0:
+					return states.jump
+				else:
+					return states.fall
+			if parent.is_grounded:
+				if parent.velocity.x != 0:
+					return states.run
+				return states.idle
 	
 	return null
+	
 func _enter_state(new_state, old_state):
-	pass
+	match new_state:
+		states.wall_slide:
+			parent.sprite.scale.x = -parent.wall_direction
 	
 func _exit_state(old_state, new_state):
 	pass

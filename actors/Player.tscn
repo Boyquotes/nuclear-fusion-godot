@@ -76,27 +76,60 @@ script = ExtResource( 3 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 7 )
 animation = "idle"
-frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, 1.45 )
 shape = SubResource( 8 )
 
-[node name="Raycasts" type="Node2D" parent="."]
+[node name="FloorRaycasts" type="Node2D" parent="."]
 
-[node name="RayCast2D" type="RayCast2D" parent="Raycasts"]
-position = Vector2( -3, 7 )
+[node name="RayCast2D" type="RayCast2D" parent="FloorRaycasts"]
+position = Vector2( -3, 7.5 )
 scale = Vector2( 0.1, 0.1 )
 enabled = true
-cast_to = Vector2( 0, 16 )
+cast_to = Vector2( 0, 8 )
 collision_mask = 8
 
-[node name="RayCast2D2" type="RayCast2D" parent="Raycasts"]
-position = Vector2( 3, 7 )
+[node name="RayCast2D2" type="RayCast2D" parent="FloorRaycasts"]
+position = Vector2( 3, 7.5 )
 scale = Vector2( 0.1, 0.1 )
 enabled = true
-cast_to = Vector2( 0, 16 )
+cast_to = Vector2( 0, 8 )
+collision_mask = 8
+
+[node name="WallRaycasts" type="Node2D" parent="."]
+
+[node name="LeftWallRaycasts" type="Node2D" parent="WallRaycasts"]
+
+[node name="LeftWallRaycastTop" type="RayCast2D" parent="WallRaycasts/LeftWallRaycasts"]
+position = Vector2( -3, -2 )
+scale = Vector2( 0.1, 0.1 )
+enabled = true
+cast_to = Vector2( -8, 0 )
+collision_mask = 8
+
+[node name="LeftWallRaycastBottom" type="RayCast2D" parent="WallRaycasts/LeftWallRaycasts"]
+position = Vector2( -3, 4 )
+scale = Vector2( 0.1, 0.1 )
+enabled = true
+cast_to = Vector2( -8, 0 )
+collision_mask = 8
+
+[node name="RightWallRaycasts" type="Node2D" parent="WallRaycasts"]
+
+[node name="RightWallRaycastTop" type="RayCast2D" parent="WallRaycasts/RightWallRaycasts"]
+position = Vector2( 3, -2 )
+scale = Vector2( 0.1, 0.1 )
+enabled = true
+cast_to = Vector2( 8, 0 )
+collision_mask = 8
+
+[node name="RightWallRaycastBottom" type="RayCast2D" parent="WallRaycasts/RightWallRaycasts"]
+position = Vector2( 3, 4 )
+scale = Vector2( 0.1, 0.1 )
+enabled = true
+cast_to = Vector2( 8, 0 )
 collision_mask = 8
 
 [connection signal="grounded_updated" from="." to="Camera2D" method="_on_Player_grounded_updated"]
