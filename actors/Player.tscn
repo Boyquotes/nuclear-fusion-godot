@@ -76,7 +76,6 @@ script = ExtResource( 3 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 7 )
 animation = "idle"
-frame = 1
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -89,12 +88,14 @@ shape = SubResource( 8 )
 position = Vector2( -3, 7.5 )
 scale = Vector2( 0.1, 0.1 )
 enabled = true
+cast_to = Vector2( 0, 16 )
 collision_mask = 8
 
 [node name="RayCast2D2" type="RayCast2D" parent="FloorRaycasts"]
 position = Vector2( 3, 7.5 )
 scale = Vector2( 0.1, 0.1 )
 enabled = true
+cast_to = Vector2( 0, 16 )
 collision_mask = 8
 
 [node name="WallRaycasts" type="Node2D" parent="."]
