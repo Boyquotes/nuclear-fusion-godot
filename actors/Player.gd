@@ -82,7 +82,7 @@ func _handle_wall_slide_sticking():
 
 func _get_h_weight():
 	if is_grounded:
-		return 0.2
+		return 0.4
 	else:
 		if move_direction == 0:
 			return 0.02

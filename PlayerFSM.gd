@@ -40,7 +40,7 @@ func _get_transition(delta):
 					return states.jump
 				elif parent.velocity.y >= 0:
 					return states.fall
-			elif parent.velocity.x != 0:
+			elif parent.velocity.x != 0 && parent.move_direction != 0:
 				return states.run
 		states.run:
 			if !parent.is_grounded:
@@ -70,21 +70,6 @@ func _get_transition(delta):
 				return states.idle
 			elif parent.wall_direction == 0:
 				return states.fall
-			#if parent.move_direction != parent.wall_direction:
-				#return states.fall
-			#elif parent.wall_direction == 0:
-				#if parent.is_grounded:
-					#if parent.velocity.x != 0:
-						#return states.run
-					#return states.idle
-				#elif parent.velocity.y < 0:
-					#return states.jump
-				#else:
-					#return states.fall
-			#elif parent.is_grounded:
-				#if parent.velocity.x != 0:
-					#return states.run
-				#return states.idle
 	
 	return null
 	
@@ -92,6 +77,15 @@ func _enter_state(new_state, old_state):
 	match new_state:
 		states.wall_slide:
 			parent.sprite.scale.x = -parent.wall_direction
+			parent.sprite.animation = "wall_slide"
+		states.run:
+			parent.sprite.animation = "run"
+		states.jump:
+			parent.sprite.animation = "jump"
+		states.fall:
+			parent.sprite.animation = "fall"
+		states.idle:
+			parent.sprite.animation = "idle"
 	
 func _exit_state(old_state, new_state):
 	match old_state:
